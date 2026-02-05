@@ -1,0 +1,11 @@
+server:
+  port: 8086
+hm:
+  db:
+    database: hm-pay
+  swagger:
+    title: 黑马商城支付相关接口文档
+    package: com.hmall.pay.controller
+feign:
+  okhttp:
+    enabled: true

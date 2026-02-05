@@ -1,0 +1,41 @@
+hm:
+  db:
+    host: localhost
+    pw: 1234
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${hm.db.host}:3306/hmall?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&rewriteBatchedStatements=true&useSSL=false
+    username: root
+    password: ${hm.db.pw}
+
+  sql:
+    init:
+      mode: never
+  autoconfigure:
+    exclude: 
+      - org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 10
+          min-idle: 1
+          time-between-eviction-runs: 10s
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      table-prefix: tb_
+      id-type: auto
