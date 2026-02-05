@@ -9,3 +9,5 @@ hm:
     package: com.hmall.cart.controller
   db:
     database: hm-cart
+  cart:
+    max-items: 10  # 购物车单个商品最大数量限制

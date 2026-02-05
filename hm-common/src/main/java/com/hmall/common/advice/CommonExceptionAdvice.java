@@ -2,6 +2,7 @@ package com.hmall.common.advice;
 
 import com.hmall.common.domain.R;
 import com.hmall.common.exception.BadRequestException;
+import com.hmall.common.exception.CartLimitException;
 import com.hmall.common.exception.CommonException;
 import com.hmall.common.exception.DbException;
 import com.hmall.common.utils.WebUtils;
@@ -30,6 +31,12 @@ public class CommonExceptionAdvice {
     public Object handleBadRequestException(CommonException e) {
         log.error("自定义异常 -> {} , 异常原因：{}  ",e.getClass().getName(), e.getMessage());
         log.debug("", e);
+        return processResponse(e);
+    }
+
+    @ExceptionHandler(CartLimitException.class)
+    public Object handleCartLimitException(CartLimitException e) {
+        log.warn("购物车数量限制异常 -> {}", e.getMessage());
         return processResponse(e);
     }
 

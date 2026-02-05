@@ -5,11 +5,14 @@ import com.hmall.cart.domain.dto.CartFormDTO;
 import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
 import com.hmall.cart.service.ICartService;
+import com.hmall.common.domain.R;
+import com.hmall.common.exception.CartLimitException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,19 +30,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/carts")
 @RequiredArgsConstructor
+@Slf4j
 public class CartController {
     private final ICartService cartService;
 
     @Operation(summary = "添加商品到购物车")
     @PostMapping
-    public void addItem2Cart(@Valid @RequestBody CartFormDTO cartFormDTO){
-        cartService.addItem2Cart(cartFormDTO);
+    public R<Void> addItem2Cart(@Valid @RequestBody CartFormDTO cartFormDTO){
+        try {
+            cartService.addItem2Cart(cartFormDTO);
+            return R.ok();
+        } catch (CartLimitException e) {
+            log.warn("购物车添加数量超限: {}", e.getMessage());
+            return R.error(400, e.getMessage());
+        } catch (Exception e) {
+            log.error("添加商品到购物车失败", e);
+            return R.error("添加商品失败");
+        }
     }
 
     @Operation(summary = "更新购物车数据")
     @PutMapping
-    public void updateCart(@RequestBody Cart cart){
-        cartService.updateById(cart);
+    public R<Void> updateCart(@RequestBody Cart cart){
+        try {
+            cartService.updateCartWithValidation(cart);
+            return R.ok();
+        } catch (CartLimitException e) {
+            log.warn("购物车更新数量超限: {}", e.getMessage());
+            return R.error(400, e.getMessage());
+        } catch (Exception e) {
+            log.error("更新购物车失败", e);
+            return R.error("更新购物车失败");
+        }
     }
 
     @Operation(summary = "删除购物车中商品")

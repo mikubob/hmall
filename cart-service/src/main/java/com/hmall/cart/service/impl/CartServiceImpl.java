@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.client.ItemClient;
 import com.hmall.api.dto.ItemDTO;
+import com.hmall.cart.config.CartProperties;
 import com.hmall.cart.domain.dto.CartFormDTO;
 import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
@@ -12,6 +13,7 @@ import com.hmall.cart.mapper.CartMapper;
 import com.hmall.cart.service.ICartService;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.exception.BizIllegalException;
+import com.hmall.common.exception.CartLimitException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
 import com.hmall.common.utils.UserContext;
@@ -38,6 +40,7 @@ import java.util.stream.Collectors;
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
     private final ItemClient itemClient;
+    private final CartProperties cartProperties;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -47,6 +50,16 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 2.判断是否已经存在
         if(checkItemExists(cartFormDTO.getItemId(), userId)){
             // 2.1.存在，则更新数量
+            // 先检查更新后是否会超过最大数量限制
+            Cart existingCart = lambdaQuery()
+                    .eq(Cart::getUserId, userId)
+                    .eq(Cart::getItemId, cartFormDTO.getItemId())
+                    .one();
+            
+            if (existingCart != null && existingCart.getNum() >= cartProperties.getMaxItems()) {
+                throw new CartLimitException(StrUtil.format("单个商品数量已达上限{}件", cartProperties.getMaxItems()));
+            }
+            
             baseMapper.updateNum(cartFormDTO.getItemId(), userId);
             return;
         }
@@ -115,8 +128,8 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
     private void checkCartsFull(Long userId) {
         Long count = lambdaQuery().eq(Cart::getUserId, userId).count();
-        if (count >= 10) {
-            throw new BizIllegalException(StrUtil.format("用户购物车课程不能超过{}", 10));
+        if (count >= cartProperties.getMaxItems()) {
+            throw new BizIllegalException(StrUtil.format("购物车商品数量已达上限{}件", cartProperties.getMaxItems()));
         }
     }
 
@@ -126,5 +139,25 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
                 .eq(Cart::getItemId, itemId)
                 .count();
         return count > 0;
+    }
+    
+    @Override
+    public void updateCartWithValidation(Cart cart) {
+        // 获取当前用户ID
+        Long userId = UserContext.getUser();
+        
+        // 验证该购物车项确实属于当前用户
+        Cart existingCart = getById(cart.getId());
+        if (existingCart == null || !existingCart.getUserId().equals(userId)) {
+            throw new BizIllegalException("无权操作该购物车项");
+        }
+        
+        // 检查数量限制
+        if (cart.getNum() != null && cart.getNum() > cartProperties.getMaxItems()) {
+            throw new CartLimitException(StrUtil.format("单个商品数量已达上限{}件", cartProperties.getMaxItems()));
+        }
+        
+        // 执行更新
+        updateById(cart);
     }
 }
