@@ -19,3 +19,4 @@ spring:
     sentinel:
       transport:
         dashboard: localhost:8090
+      http-method-specify: true # 是否设置请求方式作为资源名称

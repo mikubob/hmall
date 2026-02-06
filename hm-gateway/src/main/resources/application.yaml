@@ -26,7 +26,8 @@ spring:
             - Path=/pay-orders/**
     sentinel:
       transport:
-        port: 8090
+        dashboard: localhost:8090
+      http-method-specify: true # 是否设置请求方式作为资源名称
 hm:
   jwt:
     location: classpath:hmall.jks
