@@ -71,7 +71,6 @@
             <artifactId>hm-api</artifactId>
             <version>1.0.0</version>
         </dependency>
-
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>

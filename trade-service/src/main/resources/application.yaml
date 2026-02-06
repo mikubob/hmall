@@ -9,3 +9,8 @@ hm:
 feign:
   okhttp:
     enabled: true
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090

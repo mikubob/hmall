@@ -6,3 +6,8 @@ hm:
   swagger:
     title: 黑马商城商品管理接口文档
     package: com.hmall.item.controller
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090

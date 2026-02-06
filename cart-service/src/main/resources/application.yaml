@@ -9,3 +9,8 @@ hm:
     package: com.hmall.cart.controller
   db:
     database: hm-cart
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090

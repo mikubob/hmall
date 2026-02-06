@@ -24,6 +24,9 @@ spring:
           uri: lb://pay-service
           predicates:
             - Path=/pay-orders/**
+    sentinel:
+      transport:
+        port: 8090
 hm:
   jwt:
     location: classpath:hmall.jks
