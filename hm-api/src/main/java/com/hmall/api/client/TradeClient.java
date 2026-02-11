@@ -1,10 +1,11 @@
 package com.hmall.api.client;
 
+import com.hmall.api.fallback.TradeClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
-@FeignClient("trade-service")
+@FeignClient(value = "trade-service",fallbackFactory = TradeClientFallback.class)
 public interface TradeClient {
 
     // 修改订单状态
