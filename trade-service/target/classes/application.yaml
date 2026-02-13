@@ -15,3 +15,9 @@ spring:
       transport:
         dashboard: localhost:8090
       http-method-specify: true # 是否设置请求方式作为资源名称
+  rabbitmq:
+    host: 192.168.35.132
+    port: 5672 # 端口
+    virtual-host: /hmall # 虚拟主机
+    username: hmall # 用户名
+    password: 123 # 密码

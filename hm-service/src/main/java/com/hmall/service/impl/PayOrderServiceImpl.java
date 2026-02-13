@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.client.TradeClient;
+import com.hmall.api.client.UserClient;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.UserContext;
@@ -13,7 +14,6 @@ import com.hmall.domain.po.PayOrder;
 import com.hmall.enums.PayStatus;
 import com.hmall.mapper.PayOrderMapper;
 import com.hmall.service.IPayOrderService;
-import com.hmall.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +32,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
 
-    private final IUserService userService;
-
     private final TradeClient tradeClient;
+
+    private final UserClient userClient;
+
+    //private final RabbitTemplate
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
@@ -47,7 +49,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     @Override
     @Transactional
     public void tryPayOrderByBalance(PayOrderFormDTO payOrderFormDTO) {
-        // 1.查询支付单
+        /*// 1.查询支付单
         PayOrder po = getById(payOrderFormDTO.getId());
         // 2.判断状态
         if(!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())){
@@ -62,7 +64,25 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             throw new BizIllegalException("交易已支付或关闭！");
         }
         // 5.修改订单状态
-        tradeClient.markOrderPaySuccess(po.getBizOrderNo());
+        tradeClient.markOrderPaySuccess(po.getBizOrderNo());*/
+
+        //1.查询支付单
+        PayOrder po = getById(payOrderFormDTO.getId());
+        //2.判断状态
+        if (!PayStatus.WAIT_BUYER_PAY.equalsValue(po.getStatus())) {
+            //订单不是未支付，状态异常
+            throw new BizIllegalException("交易已支付或关闭！");
+        }
+        //3.尝试扣减余额
+        userClient.deductMoney(payOrderFormDTO.getPw(),po.getAmount());
+        //4.修改支付单状态
+        if (!markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now())) {
+            throw new BizIllegalException("交易已支付或关闭！");
+        }
+        //5.修改订单状态
+        //tradeClient.markOrderPaySuccess(po.getBizOrderNo());
+
+
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
