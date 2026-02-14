@@ -15,6 +15,9 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface ItemMapper extends BaseMapper<Item> {
 
-    @Update("UPDATE item SET stock = stock - #{num} WHERE id = #{itemId}")
+    @Update("UPDATE tb_item SET stock = stock - #{num} WHERE id = #{itemId}")
     void updateStock(OrderDetailDTO orderDetail);
+
+    @Update("UPDATE tb_item SET stock = stock + #{num} WHERE id = #{itemId}")
+    void addStock(OrderDetailDTO orderDetail);
 }

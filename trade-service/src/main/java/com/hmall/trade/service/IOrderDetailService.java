@@ -13,5 +13,4 @@ import com.hmall.trade.domain.po.OrderDetail;
  * @since 2023-05-05
  */
 public interface IOrderDetailService extends IService<OrderDetail> {
-
 }

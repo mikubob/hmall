@@ -18,7 +18,22 @@ import java.util.List;
  */
 public interface IItemService extends IService<Item> {
 
+    /**
+     * 扣减库存
+     * @param items
+     */
     void deductStock(List<OrderDetailDTO> items);
 
+    /**
+     * 查询商品信息
+     * @param ids
+     * @return
+     */
     List<ItemDTO> queryItemByIds(Collection<Long> ids);
+
+    /**
+     * 恢复库存
+     * @param orderDetails
+     */
+    void restoreStock(List<OrderDetailDTO> orderDetails);
 }

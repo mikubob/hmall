@@ -15,7 +15,22 @@ import com.hmall.trade.domain.po.Order;
  */
 public interface IOrderService extends IService<Order> {
 
+    /**
+     * 创建订单
+     * @param orderFormDTO
+     * @return
+     */
     Long createOrder(OrderFormDTO orderFormDTO);
 
+    /**
+     * 标记订单支付成功
+     * @param orderId
+     */
     void markOrderPaySuccess(Long orderId);
+
+    /**
+     * 取消订单
+     * @param orderId
+     */
+    void cancelOrder(Long orderId);
 }

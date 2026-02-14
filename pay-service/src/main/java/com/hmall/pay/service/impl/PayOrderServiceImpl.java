@@ -91,6 +91,14 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
     }
 
+    @Override
+    public void updatePayOrderStatusByBizOrderNo(Long orderId, Integer status) {
+        lambdaUpdate()
+                .set(PayOrder::getStatus, status)
+                .eq(PayOrder::getBizOrderNo, orderId)
+                .update();
+    }
+
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
         log.info("标记支付单成功，ID: {}", id);
         boolean result = lambdaUpdate()

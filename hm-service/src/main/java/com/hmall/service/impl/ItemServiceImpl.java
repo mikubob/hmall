@@ -23,6 +23,10 @@ import java.util.List;
 @Service
 public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements IItemService {
 
+    /**
+     * 批量扣减库存
+     * @param items
+     */
     @Override
     public void deductStock(List<OrderDetailDTO> items) {
         String sqlStatement = "com.hmall.mapper.ItemMapper.updateStock";
@@ -37,8 +41,30 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, Item> implements II
         }
     }
 
+    /**
+     * 查询商品信息
+     * @param ids
+     * @return
+     */
     @Override
     public List<ItemDTO> queryItemByIds(Collection<Long> ids) {
         return BeanUtils.copyList(listByIds(ids), ItemDTO.class);
+    }
+
+    /**
+     * 恢复库存
+     * @param orderDetails
+     */
+    @Override
+    public void restoreStock(List<OrderDetailDTO> orderDetails) {
+        for (OrderDetailDTO orderDetail : orderDetails) {
+            //1. 根据商品id查询商品信息
+            Item item = lambdaQuery().eq(Item::getId, orderDetail.getItemId()).one();
+            //2.还原库存
+            lambdaUpdate()
+                    .set(Item::getStock, item.getStock() + orderDetail.getNum())//现在的库存+购买的数量
+                    .eq(Item::getId, orderDetail.getItemId())
+                    .update();
+        }
     }
 }

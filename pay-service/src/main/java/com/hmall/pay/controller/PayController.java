@@ -1,9 +1,11 @@
 package com.hmall.pay.controller;
 
+import com.hmall.api.dto.PayOrderDTO;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.pay.domain.dto.PayApplyDTO;
 import com.hmall.pay.domain.dto.PayOrderFormDTO;
+import com.hmall.pay.domain.po.PayOrder;
 import com.hmall.pay.domain.vo.PayOrderVO;
 import com.hmall.pay.enums.PayType;
 import com.hmall.pay.service.IPayOrderService;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,5 +53,19 @@ public class PayController {
     @GetMapping
     public List<PayOrderVO> queryPayOrders(){
         return BeanUtils.copyList(payOrderService.list(), PayOrderVO.class);
+    }
+
+    @Operation(summary = "根据id查询订单")
+    @GetMapping("/biz/{id}")
+    public PayOrderDTO queryPayOrderByBizOrderNo(@PathVariable("id") Long id){
+        PayOrder payOrder=payOrderService.lambdaQuery().eq(PayOrder::getBizOrderNo, id).one();
+        return BeanUtils.copyBean(payOrder, PayOrderDTO.class);
+    }
+
+    @Operation(summary = "更新支付单状态")
+    @PutMapping("/status/{id}/{status}")
+    public void updatePayOrderStatusByBizOrderNo(@PathVariable("id") Long orderId,
+                                                 @PathVariable("status") Integer status){
+        payOrderService.updatePayOrderStatusByBizOrderNo(orderId, status);
     }
 }

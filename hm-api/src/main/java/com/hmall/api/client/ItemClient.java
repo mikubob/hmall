@@ -22,4 +22,8 @@ public interface ItemClient {
     // 批量扣减库存
     @PutMapping("/items/stock/deduct")
     void deductStock(@RequestBody List<OrderDetailDTO> items);
+
+    // 恢复库存
+    @PutMapping("/items/stock/restore")
+    void restoreStock(List<OrderDetailDTO> orderDetailDTOS);
 }
