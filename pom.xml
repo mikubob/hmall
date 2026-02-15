@@ -40,6 +40,7 @@
         <hutool.version>5.8.26</hutool.version>
         <!--数据库连接版本管理-->
         <mysql.version>8.0.33</mysql.version>
+        <elasticsearch.version>7.12.1</elasticsearch.version>
     </properties>
 
     <dependencyManagement>
@@ -95,6 +96,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
     </dependencies>
 
